@@ -1,0 +1,32 @@
+* {
+  text-align: center;
+  font-family: "Courier"
+}
+
+body {
+  padding: 20px 40px;
+  font-family: "Verdana";
+}
+
+h1 {
+  margin: 20px;
+}
+
+button {
+  background-color: white;
+}
+
+.t3cell {
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  min-height: 24px;
+}
+
+.X {
+  color: green;
+}
+
+.O {
+  color: red;
+}

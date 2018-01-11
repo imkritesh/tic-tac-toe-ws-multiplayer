@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Tic-Tac-Toe Game</title>
+
+
+  <link rel='stylesheet prefetch' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css'>
+
+  <link rel="stylesheet" href="css/style.css">
+
+
+</head>
+
+<body>
+
+  <html ng-app="ticTacToeApp">
+
+  <head>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+    <!-- <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular.min.js"></script> -->
+    <script src="bower_components/angular/angular.js"> </script>
+    <!-- <script src="bower_components/ng-websocket/ng-websocket.js"></script> -->
+    <script src="bower_components/angular-websocket/dist/angular-websocket.js"></script>
+
+  </head>
+
+  <body ng-controller="ticTacToeCtrl as vm">
+    <h1>Tic Tac Toe</h1>
+    <div class="container">
+      <div class="well">
+        <div ng-repeat="row in vm.board">
+          <button class="btn-lg" ng-repeat="cell in row"ng-disabled="!vm.playerInfo.isItMyTurn || vm.isTaken(cell);" ng-class="cell.value" ng-click="vm.move($parent.$index, $index);">{{ cell.value }}
+          </button>
+        </div>
+        <br>
+        <p>
+          <span> You Are : {{ vm.playerInfo.playerSign }}</span> <br>
+          <span ng-hide="vm.winner || vm.cat">Current Player: {{ vm.getCurrentPlayer() }}</span>
+          <span ng-show="vm.winner">Player {{ vm.currentPlayer }} won!</span>
+          <span ng-show="vm.cat">Cat</span>
+        </p>
+      </div>
+    </div>
+  </body>
+
+  </html>
+
+
+
+  <script src="js/index.js"></script>
+
+
+
+
+</body>
+
+</html>
