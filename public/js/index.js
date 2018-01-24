@@ -7,13 +7,13 @@ app.controller('ticTacToeCtrl', function($websocket) {
   vm.playerInfo = {};
 
   var emptyCell = '?';
-  
+
   var getInverseSign = function(sign) {
     return sign === 'X' ? 'O' : 'X'
   };
 
   // Websocket connection
-  var ws = $websocket('ws://localhost:8080');
+  var ws = $websocket('ws://10.10.5.197:8080');
   // Websocket Incoming Message Handling
   ws.onMessage(function(message) {
     console.log('WS msg recvd:', message.data);
@@ -24,7 +24,8 @@ app.controller('ticTacToeCtrl', function($websocket) {
       let playerNumber = serverMsg.data.playerNumber;
       vm.reset(playerNumber);
     } else if (serverMsg.event == 'playerMove') {
-      vm.board[serverMsg.data.row][serverMsg.data.column].value = getInverseSign(vm.playerInfo.playerSign);
+      vm.board[serverMsg.data.row][serverMsg.data.column].value =
+          getInverseSign(vm.playerInfo.playerSign);
       checkForEndOfGame();
       vm.playerInfo.isItMyTurn = !vm.playerInfo.isItMyTurn;
     }
@@ -52,7 +53,7 @@ app.controller('ticTacToeCtrl', function($websocket) {
     vm.playerInfo.playerSign = (playerNumber == 0) ? 'X' : 'O';
     vm.playerInfo.isItMyTurn = (playerNumber == 0) ? true : false;
     vm.winner = false;
-    vm.cat = false;
+    vm.isBoardFull = false;
   };
 
   vm.getCurrentPlayer = function() {
@@ -68,20 +69,66 @@ app.controller('ticTacToeCtrl', function($websocket) {
 
 
   function checkForMatch(cell1, cell2, cell3) {
-    // TODO: return true of cell1, cell2, and cell3 are the same and are not the
+    // Return true of cell1, cell2, and cell3 are the same and are not
     // emptyCell.
+    if (cell1.value == emptyCell || cell2.value === emptyCell ||
+        cell3.value === emptyCell)
+      return false;
+    return (cell1.value === cell2.value && cell2.value === cell3.value);
   }
 
   function isBoardFull() {
-    // TODO: return true if the board is full (no emptyCell values).
+    // Return true if the board is full (no emptyCell values).
+    for (let row = 0; row < 3; row++) {
+      for (let col = 0; col < 3; col++) {
+        if (vm.board[row][col].value === emptyCell) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  function checkWinner() {
+    console.log('CHECK WINNER');
+    console.log(vm.board[0][0].value);
+
+    // Check Diagnols
+    if (checkForMatch(vm.board[0][0], vm.board[1][1], vm.board[2][2])) {
+      vm.winner = vm.board[1][1].value;
+
+      console.log('Winner Found:', vm.board[1][1]);
+      return true;
+    }
+    if (checkForMatch(vm.board[0][2], vm.board[1][1], vm.board[2][0])) {
+      vm.winner = vm.board[1][1].value;
+      console.log('Winner Found:', vm.board[1][1]);
+      return true;
+    }
+    // CHECK ROWS
+    for (let row = 0; row < 3; row++) {
+      if (checkForMatch(vm.board[row][0], vm.board[row][1], vm.board[row][2])) {
+        vm.winner = vm.board[row][0].value;
+        console.log('Winner Found:', vm.board[row][0]);
+        return true;
+      }
+    }
+    // CHECK COLUMNS
+    for (let col = 0; col < 3; col++) {
+      if (checkForMatch(vm.board[0][col], vm.board[1][col], vm.board[2][col])) {
+        vm.winner = vm.board[0][col].value;
+        console.log('Winner Found:', vm.board[0][col].value);
+        return true;
+      }
+    }
   }
 
   function checkForEndOfGame() {
-    // TODO: update the booleans vm.winner and vm.cat
+    console.log('CHECK FOR END OF GAME');
     // Check if somebody won
-
-    // Otherwise Board is full 
-    return vm.winner || vm.cat;
+    checkWinner();
+    // Otherwise Board is full
+    vm.isBoardFull = isBoardFull();
   }
 
   vm.move = function(rowIndex, columnIdex) {
@@ -89,12 +136,13 @@ app.controller('ticTacToeCtrl', function($websocket) {
     cell.value = vm.playerInfo.playerSign;
 
     vm.playerInfo.isItMyTurn = !vm.playerInfo.isItMyTurn;
-    var moveInfo = {
+    // Send Move information to websocket server
+    let moveInfo = {
       'event': 'playerMove',
       'data': {'row': rowIndex, 'column': columnIdex}
     };
-    ws.send(JSON.stringify(moveInfo));
     checkForEndOfGame();
+    ws.send(JSON.stringify(moveInfo));
   };
 });
 })();

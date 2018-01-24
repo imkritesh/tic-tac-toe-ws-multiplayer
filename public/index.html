@@ -32,15 +32,16 @@
     <div class="container">
       <div class="well">
         <div ng-repeat="row in vm.board">
-          <button class="btn-lg" ng-repeat="cell in row"ng-disabled="!vm.playerInfo.isItMyTurn || vm.isTaken(cell);" ng-class="cell.value" ng-click="vm.move($parent.$index, $index);">{{ cell.value }}
+          <button class="btn-lg" ng-repeat="cell in row"ng-disabled="!vm.playerInfo.isItMyTurn || vm.isTaken(cell) || vm.winner;" ng-class="cell.value" ng-click="vm.move($parent.$index, $index);">{{ cell.value }}
           </button>
         </div>
         <br>
         <p>
           <span> You Are : {{ vm.playerInfo.playerSign }}</span> <br>
           <span ng-hide="vm.winner || vm.cat">Current Player: {{ vm.getCurrentPlayer() }}</span>
-          <span ng-show="vm.winner">Player {{ vm.currentPlayer }} won!</span>
-          <span ng-show="vm.cat">Cat</span>
+          <span ng-show="vm.winner && vm.winner == vm.playerInfo.playerSign">You won!</span>
+          <span ng-show="vm.winner && vm.winner != vm.playerInfo.playerSign">You Lost!</span>
+          <span ng-show="vm.isBoardFull">Game Over. Its a tie.</span>
         </p>
       </div>
     </div>
